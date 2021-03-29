@@ -3,6 +3,7 @@ var Owall,Owall2,Owall3,Owall4;
 var bomberMan
 var bomb
 var inWall
+var ghost
 
 function preload(){
  brickImage=loadImage("images/brick.jpg");
@@ -20,21 +21,31 @@ function preload(){
  "images/bomb1.png","images/bomb2.png","images/bomb3.png",
  "images/bomb1.png","images/bomb2.png","images/bomb3.png",
  "images/bomb4.png")
+ ghostAnim = loadAnimation("images/tile001.png","images/tile002.png","images/tile003.png",
+ "images/tile004.png","images/tile005.png")
 }
 
 function setup() {
   createCanvas(displayHeight,displayHeight)
   wallGroup=new Group();
   bombGroup = new Group();
+  inWallGroup = new Group();
+  obstaclesGroup=new Group();
+  spawnObstacles(); 
 
 
-
-  for(var e = 50; e<height-50;e=e+65){
-
-inWall = createSprite(e,200,40,40)
-inWall.addImage(brickImage)
-inWall.scale = 0.15
-
+  for(var e = 232; e<height-50;e=e+70){
+    for(var o = 232; o<height-50;o=o+70){
+      var num=Math.round(random(0,1.5))
+      switch(num){
+        case 0: inWall = createSprite(e,o,40,40)
+                inWall.addImage(brickImage)
+                inWall.scale = 0.14;
+                inWallGroup.add(inWall)
+          break;
+        case 1:break;
+      }
+    }
   }
 
 for(var i = 160; i < height;i+=140){
@@ -84,7 +95,7 @@ for(var i = 160; i < height;i+=140){
   }
 
   
-
+  
 
   
 }
@@ -93,19 +104,19 @@ function draw() {
   background("green");  
   //World.frameRate=20;
   if(keyDown(LEFT_ARROW)){
-    bomberMan.x=bomberMan.x-2
+    bomberMan.x=bomberMan.x-3
     bomberMan.changeAnimation("left",bombermanLeft)
   }
   if(keyDown(RIGHT_ARROW)){
-    bomberMan.x=bomberMan.x+2
+    bomberMan.x=bomberMan.x+3
     bomberMan.changeAnimation("right",bombermanRight)
   } 
   if(keyDown(UP_ARROW)){
-    bomberMan.y=bomberMan.y-2
+    bomberMan.y=bomberMan.y-3
     bomberMan.changeAnimation("up",bombermanUp)
   }
   if(keyDown(DOWN_ARROW)){
-    bomberMan.y=bomberMan.y+2
+    bomberMan.y=bomberMan.y+3
     bomberMan.changeAnimation("down",bombermanDown)
   }
 
@@ -113,8 +124,15 @@ function draw() {
     bomberMan.changeAnimation("front",bombermanFront)
   }
 
-   
+  if(bomberMan.isTouching(obstaclesGroup)){
+    
+  }
+    
   bomberMan.collide(wallGroup)
+  bomberMan.collide(inWallGroup)
+  obstaclesGroup.bounceOff(wallGroup)
+  obstaclesGroup.bounceOff(inWallGroup)
+  
   drawSprites();
 }
 
@@ -126,5 +144,24 @@ function keyPressed(){
     bombGroup.add(bomb)
     bomb.lifetime=200;
 
+  }
+}
+
+function spawnObstacles(){
+  if(frameCount%100 === 0){
+    for(var e = 232; e<height-50;e=e+68){
+      for(var o = 232; o<height-50;o=o+68){
+        var num=Math.round(random(0,5))
+        switch(num){
+          case 0: ghost = createSprite(e,o,40,40)
+                  ghost.scale = 3.5;
+                  ghost.setVelocity(-4,-4)
+                  ghost.addAnimation("ghost",ghostAnim)
+                  obstaclesGroup.add(ghost)
+            break;
+          case 1:break;
+        }
+      }
+    }
   }
 }
